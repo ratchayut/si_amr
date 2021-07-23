@@ -525,12 +525,12 @@
     <child
       link="camera_front_link" />
     <axis
-      xyz="0 0 0" />
+      xyz="0 1 0" />
   </joint>
 
   <gazebo>
     <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
-    
+
       <!-- Plugin update rate in Hz -->
       <updateRate>40</updateRate>
 
@@ -580,25 +580,25 @@
       <legacyMode>false</legacyMode>
     </plugin>
   </gazebo>
-  
-  <!-- hokuyo -->
+
+  <!-- Front LiDAR -->
   <gazebo reference="lidar_front_link">
-    <sensor type="ray" name="head_hokuyo_sensor">
+    <sensor type="ray" name="lidar_front_sensor">
       <pose>0 0 0 0 0 0</pose>
       <visualize>true</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
           <horizontal>
-            <samples>720</samples>
-            <resolution>1</resolution>
+            <samples>1080</samples>
+            <resolution>0.25</resolution>
             <min_angle>-2.356195</min_angle>
             <max_angle>2.356195</max_angle>
           </horizontal>
         </scan>
         <range>
           <min>0.10</min>
-          <max>30.0</max>
+          <max>20.0</max>
           <resolution>0.01</resolution>
         </range>
         <noise>
@@ -611,31 +611,31 @@
           <stddev>0.01</stddev>
         </noise>
       </ray>
-      <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
-        <topicName>/laser/front_scan</topicName>
+      <plugin name="gazebo_ros_lidar_front_controller" filename="libgazebo_ros_laser.so">
+        <topicName>/scan_front</topicName>
         <frameName>lidar_front_link</frameName>
       </plugin>
     </sensor>
   </gazebo>
 
-  <!-- hokuyo -->
+  <!-- Rear LiDAR -->
   <gazebo reference="lidar_rear_link">
-    <sensor type="ray" name="head_hokuyo_sensor">
+    <sensor type="ray" name="lidar_rear_sensor">
       <pose>0 0 0 0 0 0</pose>
       <visualize>true</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
           <horizontal>
-            <samples>720</samples>
-            <resolution>1</resolution>
+            <samples>1080</samples>
+            <resolution>0.25</resolution>
             <min_angle>-2.356195</min_angle>
             <max_angle>2.356195</max_angle>
           </horizontal>
         </scan>
         <range>
           <min>0.10</min>
-          <max>30.0</max>
+          <max>20.0</max>
           <resolution>0.01</resolution>
         </range>
         <noise>
@@ -648,16 +648,30 @@
           <stddev>0.01</stddev>
         </noise>
       </ray>
-      <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
-        <topicName>/laser/rear_scan</topicName>
+      <plugin name="gazebo_ros_lidar_rear_controller" filename="libgazebo_ros_laser.so">
+        <topicName>/scan_rear</topicName>
         <frameName>lidar_rear_link</frameName>
       </plugin>
     </sensor>
   </gazebo>
 
+  <link name="camera_front_view_link">
+    <inertial>
+      <mass value="0.001"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+    </inertial>
+  </link>
+
+  <joint name="camera_front_view_joint" type="fixed">
+    <parent link="camera_front_link"/>
+    <child link="camera_front_view_link"/>
+    <origin xyz="0.0 0.0 0.0" rpy="-1.5708 0.0 -1.5708"/>
+  </joint>
+
   <gazebo reference="camera_front_link">
     <sensor name="camera_front" type="depth">
-    <update_rate>20</update_rate>
+      <update_rate>20</update_rate>
       <camera>
         <horizontal_fov>1.047198</horizontal_fov>
         <image>
@@ -667,7 +681,7 @@
         </image>
         <clip>
           <near>0.05</near>
-          <far>3</far>
+          <far>3.5</far>
         </clip>
       </camera>
       <plugin name="camera_front_controller" filename="libgazebo_ros_openni_kinect.so">
@@ -680,7 +694,7 @@
         <depthImageTopicName>/camera_front/depth/image_raw</depthImageTopicName>
         <depthImageInfoTopicName>/camera_front/depth/camera_info</depthImageInfoTopicName>
         <pointCloudTopicName>/camera_front/depth/points</pointCloudTopicName>
-        <frameName>camera_front_joint</frameName>
+        <frameName>camera_front_view_link</frameName>
         <pointCloudCutoff>0.5</pointCloudCutoff>
         <pointCloudCutoffMax>3.0</pointCloudCutoffMax>
         <distortionK1>0.00000001</distortionK1>
